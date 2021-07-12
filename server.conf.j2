@@ -1,0 +1,47 @@
+port 1194
+proto udp
+dev tun
+ca {{ ca_path }}
+cert {{ server_certificate_path }}
+key {{ server_key_path }}
+crl-verify {{ crl_path }}
+
+# Diffie hellman parameters.
+# Generate your own with:
+#   openssl dhparam -out dh2048.pem 2048
+dh {{ dh_path }}
+
+server 10.8.0.0 255.255.0.0
+ifconfig-pool-persist ipp.txt
+push "redirect-gateway def1 bypass-dhcp"
+push "dhcp-option DNS 8.8.8.8"
+
+keepalive 10 120
+
+# For extra security beyond that provided
+# by SSL/TLS, create an "HMAC firewall"
+# to help block DoS attacks and UDP port flooding.
+#
+# Generate with:
+#   openvpn --genkey tls-auth ta.key
+#
+# The server and each client must have
+# a copy of this key.
+# The second parameter should be '0'
+# on the server and '1' on the clients.
+;tls-auth ta.key 0 # This file is secret
+
+cipher AES-256-CBC
+
+user nobody
+group nogroup
+
+persist-key
+persist-tun
+
+status openvpn-status.log
+log         openvpn.log
+
+verb 3
+
+explicit-exit-notify 1

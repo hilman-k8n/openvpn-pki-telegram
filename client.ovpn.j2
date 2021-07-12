@@ -1,0 +1,31 @@
+client
+remote-cert-tls server
+dev tun
+proto udp
+remote {{ server_host }} {{ server_port }}
+cipher AES-256-CBC
+auth-nocache
+nobind
+persist-key
+persist-tun
+
+verb 3
+#key-direction 1
+reneg-sec 0
+script-security 2
+{% if linux_client is defined and linux_client %}
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+{% endif %}
+
+#<tls-auth>
+#</tls-auth>
+<ca>
+{{ ca_cert}}
+</ca>
+<cert>
+{{ client_cert }}
+</cert>
+<key>
+{{ client_key }}
+</key>
